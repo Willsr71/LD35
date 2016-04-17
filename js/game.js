@@ -11,6 +11,7 @@ var sounds = {};
 var isPaused = false;
 var score = 0;
 var scoreText;
+var diedImage;
 
 function preload() {
   // images
@@ -39,6 +40,7 @@ function preload() {
   game.load.image('player9', 'assets/image/player9.png');
   game.load.image('upgradebullet', 'assets/image/upgradebullet.png');
   game.load.image('upgradeplayer', 'assets/image/upgradeplayer.png');
+  game.load.image('youdied', 'assets/image/youdied.png');
 
   // audio
   game.load.audio('explode1', 'assets/sound/explode1.wav');
@@ -51,7 +53,7 @@ function create() {
   sounds.fire2 = game.add.audio('fire2');
   sounds.explode1 = game.add.audio('explode1');
 
-  scoreText = game.add.text(10, 10, "Score: 0", {
+  scoreText = game.add.text(10, 10, "Score: 0 (x1 multiplier)", {
     font: "20px Arial",
     fill: "#ff0044",
     textshadow: "2px 2px #000000"
@@ -66,6 +68,11 @@ function create() {
   paused.position.y = (game._height / 2) - (paused.height / 2);
   paused.visible = false;
 
+  diedImage = game.add.sprite(0, 0, 'youdied');
+  diedImage.position.x = (game._width / 2) - (diedImage.width / 2);
+  diedImage.position.y = (game._height / 2) - (diedImage.height / 2);
+  diedImage.visible = false;
+
   player = new Player();
 
   bullets = game.add.group();
@@ -76,6 +83,10 @@ function create() {
 
   // register keys
   game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(function(key) {
+    if (player.corners == 0) {
+      return;
+    }
+
     isPaused = !isPaused;
 
     if (isPaused) {
@@ -157,6 +168,10 @@ function updateUpgrade(upgrade) {
   if (upgrade.body.position.y < 0 || upgrade.body.position.y > game._height - upgrade.body.height ||upgrade.body.position.x < 0 || upgrade.body.position.x > game._width - upgrade.body.width) {
     upgrade.destroy();
   }
+}
+
+function updateScoreboard() {
+  scoreText.setText("Score: " + score + " (x" + player.corners + " multiplier)");
 }
 
 function createEnemies() {
@@ -248,12 +263,12 @@ function checkCollision(object1, object2) {
     return false;
   }
 
-  return Phaser.Rectangle.intersects(object1, object2);
+  return Phaser.Rectangle.intersects(object1, object2) || Phaser.Rectangle.intersects(object2, object1);
 }
 
 function bulletHitEnemy(bullet, enemy) {
-  score += enemy.size;
-  scoreText.setText("Score: " + score);
+  score += enemy.size * player.corners;
+  updateScoreboard();
 
   createExplosion(enemy.body.position.x, enemy.body.position.y);
   bullet.kill();

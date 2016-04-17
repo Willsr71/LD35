@@ -34,15 +34,20 @@ Player.prototype.addCorner = function() {
   }
 
   this.updateTexture();
+  updateScoreboard();
 }
 
 Player.prototype.removeCorner = function() {
   this.corners -= 1;
 
   if (this.corners <= 0) {
-    this.corners = 1;
+    game.paused = true;
+    diedImage.visible = true;
+    game.world.bringToTop(diedImage);
+    return;
   }
 
+  updateScoreboard();
   this.updateTexture();
 }
 
