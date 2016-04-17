@@ -1,54 +1,8 @@
-var game = new Phaser.Game(window.innerWidth, window.innerHeight - 1, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
-var background;
-var backgroundSpeed = 0;
-var paused;
-var player;
-var enemies;
-var bullets;
-var upgrades;
-var explosions = [];
-var sounds = {};
-var isPaused = false;
-var score = 0;
-var scoreText;
-var diedImage;
+Shift.Game = function(game) {
 
-function preload() {
-  // images
-  game.load.image('background', 'assets/image/background.png');
-  game.load.image('bulletplayer', 'assets/image/bulletplayer.png');
-  game.load.image('bulletenemy', 'assets/image/bulletenemy.png');
-  game.load.image('enemy1', 'assets/image/enemy1.png');
-  game.load.image('enemy2', 'assets/image/enemy2.png');
-  game.load.image('enemy3', 'assets/image/enemy3.png');
-  game.load.image('enemy4', 'assets/image/enemy4.png');
-  game.load.image('enemy5', 'assets/image/enemy5.png');
-  game.load.image('enemy6', 'assets/image/enemy6.png');
-  game.load.image('enemy7', 'assets/image/enemy7.png');
-  game.load.image('enemy8', 'assets/image/enemy8.png');
-  game.load.image('enemy9', 'assets/image/enemy9.png');
-  game.load.image('explosion1', 'assets/image/explosion1.png');
-  game.load.image('paused', 'assets/image/paused.png');
-  game.load.image('player1', 'assets/image/player1.png');
-  game.load.image('player2', 'assets/image/player2.png');
-  game.load.image('player3', 'assets/image/player3.png');
-  game.load.image('player4', 'assets/image/player4.png');
-  game.load.image('player5', 'assets/image/player5.png');
-  game.load.image('player6', 'assets/image/player6.png');
-  game.load.image('player7', 'assets/image/player7.png');
-  game.load.image('player8', 'assets/image/player8.png');
-  game.load.image('player9', 'assets/image/player9.png');
-  game.load.image('upgradebullet', 'assets/image/upgradebullet.png');
-  game.load.image('upgradeplayer', 'assets/image/upgradeplayer.png');
-  game.load.image('youdied', 'assets/image/youdied.png');
+};
 
-  // audio
-  game.load.audio('explode1', 'assets/sound/explode1.wav');
-  game.load.audio('fire1', 'assets/sound/fire1.wav');
-  game.load.audio('fire2', 'assets/sound/fire2.wav');
-}
-
-function create() {
+Shift.Game.prototype.create = function() {
   sounds.fire1 = game.add.audio('fire1');
   sounds.fire2 = game.add.audio('fire2');
   sounds.explode1 = game.add.audio('explode1');
@@ -99,10 +53,18 @@ function create() {
     }
   });
 
-  //game.paused = true;
+  game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR).onDown.add(function(key) {
+    if (player.corners != 0) {
+      return;
+    }
+
+    console.log("test");
+
+    game.state.start('MainMenu');
+  });
 }
 
-function update() {
+Shift.Game.prototype.update = function() {
   background.tilePosition.x -= backgroundSpeed;
 
   player.update();
@@ -209,6 +171,15 @@ function createEnemies() {
   }
 }
 
+function createUpgradeEntity(upgrade) {
+  game.physics.enable(upgrade, Phaser.Physics.ARCADE);
+  upgrade.anchor.setTo(0.5, 0.5);
+  upgrade.body.velocity.x = Math.round(Math.random() * 10);
+  upgrade.body.velocity.y = Math.round(Math.random() * 10);
+
+  upgrades.add(upgrade);
+}
+
 function createUpgrade(x, y, chance) {
   if (Math.round(Math.random() * 100) <= chance) {
     var upgrade;
@@ -217,18 +188,24 @@ function createUpgrade(x, y, chance) {
       // 50% chance for size upgrade
       upgrade = game.add.sprite(x, y, 'upgradeplayer');
       upgrade.upgradeType = "player";
-    } else {
+
+      createUpgradeEntity(upgrade);
+    }
+
+    if (Math.round(Math.random() * 100) <= 50) {
       // 50% chance for fire rate upgrade
       upgrade = game.add.sprite(x, y, 'upgradebullet');
       upgrade.upgradeType = "bullet";
+
+      createUpgradeEntity(upgrade);
     }
 
-    game.physics.enable(upgrade, Phaser.Physics.ARCADE);
-    upgrade.anchor.setTo(0.5, 0.5);
-    upgrade.body.velocity.x = Math.round(Math.random() * 10);
-    upgrade.body.velocity.y = Math.round(Math.random() * 10);
+    if (Math.round(Math.random() * 100) <= 10) {
+      upgrade = game.add.sprite(x, y, 'upgradeinsanity');
+      upgrade.upgradeType = "insanity";
 
-    upgrades.add(upgrade);
+      createUpgradeEntity(upgrade);
+    }
   }
 }
 
@@ -285,8 +262,19 @@ function playerHitEnemy(enemy) {
 function playerHitUpgrade(upgrade) {
   if (upgrade.upgradeType == "player") {
     player.addCorner();
-  } else if (upgrade.upgradeType == "bullet") {
+  }
+
+  if (upgrade.upgradeType == "bullet") {
     player.fireRate -= 2;
+  }
+
+  if (upgrade.upgradeType == "insanity") {
+    var oldRate = player.fireRate - 1;
+    setTimeout(function() {
+      player.fireRate = oldRate;
+    }, 5000);
+
+    player.fireRate = 0;
   }
 
   upgrade.kill();
