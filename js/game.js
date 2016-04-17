@@ -1,4 +1,4 @@
-var game = new Phaser.Game(1280, 898, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(window.innerWidth, window.innerHeight - 1, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
 var background;
 var paused;
 var player;
@@ -51,6 +51,10 @@ function create() {
   // register keys
   game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(function(key) {
     isPaused = !isPaused;
+
+    if (!isPaused) {
+      update();
+    }
   });
 
   console.log(game);
@@ -61,14 +65,14 @@ function update() {
     game.paused = true;
     paused.visible = true;
     return;
-  } else if (paused.visible || game.paused) {
+  } else {
     paused.visible = false;
     game.paused = false;
   }
 
-  background.tilePosition.x -= 1;
+  background.tilePosition.x -= player.corners;
 
-  updateEnemies();
+  createEnemies();
 
   for (var x = 0; x < bullets.length; x += 1) {
     bullets[x].update();
@@ -81,8 +85,13 @@ function update() {
   player.update();
 }
 
-function updateEnemies() {
-  if (enemies.length < 2) {
-    enemies.push(new Enemy(player.corners));
+function createEnemies() {
+  if (enemies.length < 0) {
+    var height = game._height + 1;
+    while (height > game._height) {
+      height = Math.round(Math.random() * 10000);
+    }
+
+    enemies.push(new Enemy({x:game._width, y:height}, (Math.atan2(game._width - player.pos.x, height - player.pos.y) * (180 / Math.PI)) + 90, 1));
   }
 }

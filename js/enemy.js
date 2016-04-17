@@ -1,5 +1,5 @@
 function Enemy(position, angle, size) {
-  var e = game.add.sprite(game._width, game._height);
+  var e = game.add.sprite(position.x, position.y, 'enemy' + size);
   game.physics.enable(e, Phaser.Physics.ARCADE);
 
   this.enemy = e;
@@ -22,4 +22,6 @@ Enemy.prototype.update = function() {
   if (this.enemy.body.position.y < 0 || this.enemy.body.position.y > game._height - this.enemy.body.height || this.enemy.body.position.x < 0 || this.enemy.body.position.x > game._width - this.enemy.body.width) {
     this.enemy.destroy();
   }
+
+  //this.enemy.body.position.x -= 1;
 }

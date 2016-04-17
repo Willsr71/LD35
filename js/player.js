@@ -107,7 +107,7 @@ Player.prototype.update = function() {
     this.vel.x -= 20;
   }
 
-  this.player.body.sprite.angle = -(Math.atan2(game.input.mousePointer.x - this.pos.x, game.input.mousePointer.y - this.pos.y)) * (180 / Math.PI);
+  this.player.body.sprite.angle = -Math.atan2(game.input.mousePointer.x - this.pos.x, game.input.mousePointer.y - this.pos.y) * (180 / Math.PI);
 
   // slow down horizontally
   this.vel.x -= (this.vel.x / 64);
