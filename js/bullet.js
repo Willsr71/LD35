@@ -1,5 +1,5 @@
 function Bullet(angle, position) {
-  var b = game.add.sprite(position.x, position.y, 'redbar');
+  var b = game.add.sprite(position.x, position.y, 'bulletplayer');
   game.physics.enable(b, Phaser.Physics.ARCADE);
 
   this.bullet = b;

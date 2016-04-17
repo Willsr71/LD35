@@ -9,7 +9,17 @@ var isPaused = false;
 
 function preload() {
   game.load.image('background', 'assets/image/background.png');
+  game.load.image('bulletplayer', 'assets/image/bulletplayer.png');
+  game.load.image('bulletenemy', 'assets/image/bulletenemy.png');
+  game.load.image('enemy1', 'assets/image/enemy1.png');
+  game.load.image('enemy2', 'assets/image/enemy2.png');
+  game.load.image('enemy3', 'assets/image/enemy3.png');
+  game.load.image('enemy4', 'assets/image/enemy4.png');
+  game.load.image('enemy5', 'assets/image/enemy5.png');
+  game.load.image('enemy6', 'assets/image/enemy6.png');
+  game.load.image('enemy7', 'assets/image/enemy7.png');
   game.load.image('enemy8', 'assets/image/enemy8.png');
+  game.load.image('enemy9', 'assets/image/enemy9.png');
   game.load.image('paused', 'assets/image/paused.png');
   game.load.image('player1', 'assets/image/player1.png');
   game.load.image('player2', 'assets/image/player2.png');
@@ -20,7 +30,6 @@ function preload() {
   game.load.image('player7', 'assets/image/player7.png');
   game.load.image('player8', 'assets/image/player8.png');
   game.load.image('player9', 'assets/image/player9.png');
-  game.load.image('redbar', 'assets/image/redbar.png');
   game.load.audio('fire1', 'assets/sound/fire1.wav');
   game.load.audio('fire2', 'assets/sound/fire2.wav');
 }
