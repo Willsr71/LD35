@@ -2,8 +2,8 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight - 1, Phaser.AUT
 var background;
 var paused;
 var player;
-var enemies = [];
-var bullets = [];
+var enemies;
+var bullets;
 var sounds = {};
 var isPaused = false;
 
@@ -48,6 +48,11 @@ function create() {
 
   player = new Player();
 
+  bullets = game.add.group();
+  enemies = game.add.group();
+
+  game.physics.startSystem(Phaser.Physics.ARCADE);
+
   // register keys
   game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(function(key) {
     isPaused = !isPaused;
@@ -64,6 +69,7 @@ function update() {
   if (isPaused) {
     game.paused = true;
     paused.visible = true;
+    game.world.bringToTop(paused);
     return;
   } else {
     paused.visible = false;
@@ -73,25 +79,70 @@ function update() {
   background.tilePosition.x -= player.corners;
 
   createEnemies();
+  updateEnemies();
+  updateBullets();
 
-  for (var x = 0; x < bullets.length; x += 1) {
-    bullets[x].update();
-  }
-
-  for (var x = 0; x < enemies.length; x += 1) {
-    enemies[x].update();
-  }
+    game.physics.arcade.collide(bullets, enemies, bulletHitEnemy);
 
   player.update();
+  game.world.bringToTop(player.player);
 }
 
 function createEnemies() {
-  if (enemies.length < 0) {
-    var height = game._height + 1;
-    while (height > game._height) {
-      height = Math.round(Math.random() * 10000);
+  console.log(enemies.length);
+  if (enemies.length < 4 * player.corners && Math.round(Math.random() * 100) <= 10) {
+    var ycoord = game._height + 1;
+    while (ycoord > game._height) {
+      ycoord = Math.round(Math.random() * 10000);
     }
 
-    enemies.push(new Enemy({x:game._width, y:height}, (Math.atan2(game._width - player.pos.x, height - player.pos.y) * (180 / Math.PI)) + 90, 1));
+    var size = player.corners + 1;
+    while (size > player.corners) {
+      size = Math.ceil(Math.random() * 10);
+    }
+
+    var enemy = game.add.sprite(game._width, ycoord, 'enemy' + size);
+    game.physics.enable(enemy, Phaser.Physics.ARCADE);
+    enemy.anchor.setTo(0.5, 0.5);
+
+    enemy.body.sprite.angle = -90;
+    enemy.body.velocity.x = -40 * size;
+
+    enemies.add(enemy);
+    //enemies.push(new Enemy({x:game._width, y:height}, (Math.atan2(game._width - player.pos.x, height - player.pos.y) * (180 / Math.PI)) + 90, 1));
   }
+}
+
+function updateEnemies() {
+  enemies.forEach(updateEnemy, this, true);
+}
+
+function updateEnemy(enemy) {
+  if (enemy.body == null) {
+    return;
+  }
+
+  if (enemy.body.position.x < 0) {
+    enemy.destroy();
+  }
+}
+
+function updateBullets() {
+  bullets.forEach(updateBullet, this, true);
+}
+
+function updateBullet(bullet) {
+  if (bullet.body == null) {
+    return;
+  }
+
+  if (bullet.body.position.y < 0 || bullet.body.position.y > game._height - bullet.body.height ||bullet.body.position.x < 0 || bullet.body.position.x > game._width - bullet.body.width) {
+    bullet.destroy();
+  }
+}
+
+function bulletHitEnemy(bullet, enemy) {
+  console.log("hit");
+  bullet.kill();
+  enemy.kill();
 }

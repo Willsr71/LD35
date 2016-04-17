@@ -11,7 +11,7 @@ function Player() {
   this.pos = this.player.body.position;
   this.vel = this.player.body.velocity;
 
-  this.fireRate = 20;
+  this.fireRate = 40;
   this.ticksSinceLastFire = 0;
   this.corners = 1;
 
@@ -68,7 +68,15 @@ Player.prototype.fire = function() {
   this.lastAngleFired = angles[this.lastCornerFired];*/
 
   for (var x = 0; x < angles.length; x += 1) {
-    bullets.push(new Bullet(angles[x], {x:this.pos.x + this.player.body.halfWidth, y:this.pos.y + this.player.body.halfHeight}));
+    var bullet = game.add.sprite(this.pos.x + this.player.body.halfWidth, this.pos.y + this.player.body.halfHeight, 'bulletplayer');
+    game.physics.enable(bullet, Phaser.Physics.ARCADE);
+    bullet.anchor.setTo(0.5, 0.5);
+    bullet.body.sprite.angle = angles[x] - 90;
+    bullet.body.velocity.x = Math.cos(angles[x] * (Math.PI / 180)) * 400;
+    bullet.body.velocity.y = Math.sin(angles[x] * (Math.PI / 180)) * 400;
+
+    bullets.add(bullet);
+    //bullets.push(new Bullet(angles[x]));
   }
 
   sounds.fire2.play();
