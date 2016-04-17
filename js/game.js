@@ -4,9 +4,12 @@ var paused;
 var player;
 var enemies;
 var bullets;
+var upgrades;
 var explosions = [];
 var sounds = {};
 var isPaused = false;
+var score = 0;
+var scoreText;
 
 function preload() {
   // images
@@ -33,6 +36,8 @@ function preload() {
   game.load.image('player7', 'assets/image/player7.png');
   game.load.image('player8', 'assets/image/player8.png');
   game.load.image('player9', 'assets/image/player9.png');
+  game.load.image('upgradebullet', 'assets/image/upgradebullet.png');
+  game.load.image('upgradeplayer', 'assets/image/upgradeplayer.png');
 
   // audio
   game.load.audio('explode1', 'assets/sound/explode1.wav');
@@ -44,6 +49,13 @@ function create() {
   sounds.fire1 = game.add.audio('fire1');
   sounds.fire2 = game.add.audio('fire2');
   sounds.explode1 = game.add.audio('explode1');
+
+  scoreText = game.add.text(game.halfWidth, game.halfHeight, "Score: 0", {
+    font: "20px Arial",
+    fill: "#ff0044",
+    align: "left"
+  });
+  scoreText.anchor.setTo(0.5, 0.5);
 
   background = game.add.tileSprite(0, 0, game._width, game._height, 'background');
   //game.world.setBounds(0, 0, game._width, game._height);
@@ -57,6 +69,7 @@ function create() {
 
   bullets = game.add.group();
   enemies = game.add.group();
+  upgrades = game.add.group();
 
   game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -74,7 +87,7 @@ function create() {
     }
   });
 
-  console.log(game);
+  //game.paused = true;
 }
 
 function update() {
@@ -83,44 +96,11 @@ function update() {
   player.update();
 
   createEnemies();
-  updateEnemies();
-  updateBullets();
-
-  //game.physics.arcade.collide(bullets, enemies, bulletHitEnemy, collisionProcess);
-  //game.physics.arcade.collide(player.player, enemies, playerHitEnemy, collisionProcess);
+  enemies.forEach(updateEnemy, this, true);
+  bullets.forEach(updateBullet, this, true);
+  upgrades.forEach(updateUpgrade, this, true);
 
   game.world.bringToTop(player.player);
-}
-
-function createEnemies() {
-  //console.log(enemies.length);
-  if (enemies.length < 10 * player.corners && Math.round(Math.random() * 100) <= 10) {
-    var ycoord = game._height + 1;
-    while (ycoord > game._height) {
-      ycoord = Math.round(Math.random() * 10000);
-    }
-
-    var size = player.corners + 1;
-    while (size > player.corners) {
-      size = Math.ceil(Math.random() * 10);
-    }
-
-    var enemy = game.add.sprite(game._width, ycoord, 'enemy' + size);
-    game.physics.enable(enemy, Phaser.Physics.ARCADE);
-    enemy.anchor.setTo(0.5, 0.5);
-
-    enemy.body.sprite.angle = -90;
-    enemy.body.velocity.x = -40 * size;
-
-    enemy.size = size;
-
-    enemies.add(enemy);
-    //enemies.push(new Enemy({x:game._width, y:height}, (Math.atan2(game._width - player.pos.x, height - player.pos.y) * (180 / Math.PI)) + 90, 1));
-  }
-}
-
-function updateEnemies() {
-  enemies.forEach(updateEnemy, this, true);
 }
 
 function updateEnemy(enemy) {
@@ -146,24 +126,10 @@ function updateEnemy(enemy) {
   }
 
   if (enemy.body.position.x < 0) {
+    createExplosion(enemy.body.position.x, enemy.body.position.y);
     enemies.remove(enemy, true);
+    player.removeCorner();
   }
-}
-
-function damageEnemy(enemy) {
-  enemy.size -= 1;
-
-  if (enemy.size <= 0) {
-    enemy.destroy();
-    return;
-  }
-
-  enemy.body.sprite.loadTexture('enemy' + enemy.size);
-  enemy.body.velocity.x = -40 * enemy.size;
-}
-
-function updateBullets() {
-  bullets.forEach(updateBullet, this, true);
 }
 
 function updateBullet(bullet) {
@@ -173,6 +139,70 @@ function updateBullet(bullet) {
 
   if (bullet.body.position.y < 0 || bullet.body.position.y > game._height - bullet.body.height ||bullet.body.position.x < 0 || bullet.body.position.x > game._width - bullet.body.width) {
     bullet.destroy();
+  }
+}
+
+function updateUpgrade(upgrade) {
+  if (checkCollision(player.player, upgrade)) {
+    playerHitUpgrade(upgrade);
+    return;
+  }
+
+  if (upgrade.body == null) {
+    return;
+  }
+
+  if (upgrade.body.position.y < 0 || upgrade.body.position.y > game._height - upgrade.body.height ||upgrade.body.position.x < 0 || upgrade.body.position.x > game._width - upgrade.body.width) {
+    upgrade.destroy();
+  }
+}
+
+function createEnemies() {
+  //console.log(enemies.length);
+  if (enemies.length < 10 * player.corners && Math.round(Math.random() * 100) <= 10) {
+    var ycoord = game._height + 1;
+    while (ycoord > game._height - 20) {
+      ycoord = Math.round(Math.random() * 10000);
+    }
+
+    var size = player.corners + 1;
+    while (size > player.corners) {
+      size = Math.ceil(Math.random() * 10);
+    }
+
+    var enemy = game.add.sprite(game._width, ycoord, 'enemy' + size);
+    game.physics.enable(enemy, Phaser.Physics.ARCADE);
+    enemy.anchor.setTo(0.5, 0.5);
+
+    enemy.body.sprite.angle = -90;
+    enemy.body.velocity.x = -40 * size;
+
+    enemy.size = size;
+
+    enemies.add(enemy);
+  }
+}
+
+function createUpgrade(x, y, chance) {
+  if (Math.round(Math.random() * 100) <= chance) {
+    var upgrade;
+
+    if (Math.round(Math.random() * 100) <= 60) {
+      // 60% chance for size upgrade
+      upgrade = game.add.sprite(x, y, 'upgradeplayer');
+      upgrade.upgradeType = "player";
+    } else {
+      // 40% chance for fire rate upgrade
+      upgrade = game.add.sprite(x, y, 'upgradebullet');
+      upgrade.upgradeType = "bullet";
+    }
+
+    game.physics.enable(upgrade, Phaser.Physics.ARCADE);
+    upgrade.anchor.setTo(0.5, 0.5);
+    upgrade.body.velocity.x = Math.round(Math.random() * 10);
+    upgrade.body.velocity.y = Math.round(Math.random() * 10);
+
+    upgrades.add(upgrade);
   }
 }
 
@@ -189,13 +219,26 @@ function createExplosion(x, y) {
   }, 400);
 }
 
+function damageEnemy(enemy) {
+  scoreText.setText("Score: " + score);
 
+  enemy.size -= 1;
+
+  if (enemy.size <= 0) {
+    createUpgrade(enemy.body.position.x, enemy.body.position.y, 5);
+    enemy.destroy();
+    return;
+  }
+
+  enemy.body.sprite.loadTexture('enemy' + enemy.size);
+  enemy.body.velocity.x = -40 * enemy.size;
+}
 
 function checkCollision(object1, object2) {
   if (!object1._exists || !object2._exists) {
     return false;
   }
-  
+
   return Phaser.Rectangle.intersects(object1, object2);
 }
 
@@ -210,4 +253,14 @@ function playerHitEnemy(enemy) {
   createExplosion(enemy.body.position.x, enemy.body.position.y);
   damageEnemy(enemy);
   player.removeCorner();
+}
+
+function playerHitUpgrade(upgrade) {
+  if (upgrade.upgradeType == "player") {
+    player.addCorner();
+  } else if (upgrade.upgradeType == "bullet") {
+    player.fireRate -= 10;
+  }
+  
+  upgrade.kill();
 }

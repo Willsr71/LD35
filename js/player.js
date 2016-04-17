@@ -11,7 +11,7 @@ function Player() {
   this.pos = this.player.body.position;
   this.vel = this.player.body.velocity;
 
-  this.fireRate = 0;
+  this.fireRate = 40;
   this.ticksSinceLastFire = 0;
   this.corners = 1;
 
