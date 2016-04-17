@@ -11,7 +11,7 @@ function Player() {
   this.pos = this.player.body.position;
   this.vel = this.player.body.velocity;
 
-  this.fireRate = 40;
+  this.fireRate = 0;
   this.ticksSinceLastFire = 0;
   this.corners = 1;
 
@@ -72,8 +72,8 @@ Player.prototype.fire = function() {
     game.physics.enable(bullet, Phaser.Physics.ARCADE);
     bullet.anchor.setTo(0.5, 0.5);
     bullet.body.sprite.angle = angles[x] - 90;
-    bullet.body.velocity.x = Math.cos(angles[x] * (Math.PI / 180)) * 400;
-    bullet.body.velocity.y = Math.sin(angles[x] * (Math.PI / 180)) * 400;
+    bullet.body.velocity.x = Math.cos(angles[x] * (Math.PI / 180)) * 800;
+    bullet.body.velocity.y = Math.sin(angles[x] * (Math.PI / 180)) * 800;
 
     bullets.add(bullet);
     //bullets.push(new Bullet(angles[x]));

@@ -4,10 +4,12 @@ var paused;
 var player;
 var enemies;
 var bullets;
+var explosions = [];
 var sounds = {};
 var isPaused = false;
 
 function preload() {
+  // images
   game.load.image('background', 'assets/image/background.png');
   game.load.image('bulletplayer', 'assets/image/bulletplayer.png');
   game.load.image('bulletenemy', 'assets/image/bulletenemy.png');
@@ -20,6 +22,7 @@ function preload() {
   game.load.image('enemy7', 'assets/image/enemy7.png');
   game.load.image('enemy8', 'assets/image/enemy8.png');
   game.load.image('enemy9', 'assets/image/enemy9.png');
+  game.load.image('explosion1', 'assets/image/explosion1.png');
   game.load.image('paused', 'assets/image/paused.png');
   game.load.image('player1', 'assets/image/player1.png');
   game.load.image('player2', 'assets/image/player2.png');
@@ -30,6 +33,9 @@ function preload() {
   game.load.image('player7', 'assets/image/player7.png');
   game.load.image('player8', 'assets/image/player8.png');
   game.load.image('player9', 'assets/image/player9.png');
+
+  // audio
+  game.load.audio('explode1', 'assets/sound/explode1.wav');
   game.load.audio('fire1', 'assets/sound/fire1.wav');
   game.load.audio('fire2', 'assets/sound/fire2.wav');
 }
@@ -37,6 +43,7 @@ function preload() {
 function create() {
   sounds.fire1 = game.add.audio('fire1');
   sounds.fire2 = game.add.audio('fire2');
+  sounds.explode1 = game.add.audio('explode1');
 
   background = game.add.tileSprite(0, 0, game._width, game._height, 'background');
   //game.world.setBounds(0, 0, game._width, game._height);
@@ -57,8 +64,13 @@ function create() {
   game.input.keyboard.addKey(Phaser.Keyboard.ESC).onDown.add(function(key) {
     isPaused = !isPaused;
 
-    if (!isPaused) {
-      update();
+    if (isPaused) {
+      game.paused = true;
+      paused.visible = true;
+      game.world.bringToTop(paused);
+    } else {
+      paused.visible = false;
+      game.paused = false;
     }
   });
 
@@ -66,31 +78,23 @@ function create() {
 }
 
 function update() {
-  if (isPaused) {
-    game.paused = true;
-    paused.visible = true;
-    game.world.bringToTop(paused);
-    return;
-  } else {
-    paused.visible = false;
-    game.paused = false;
-  }
-
   background.tilePosition.x -= player.corners;
+
+  player.update();
 
   createEnemies();
   updateEnemies();
   updateBullets();
 
-    game.physics.arcade.collide(bullets, enemies, bulletHitEnemy);
+  //game.physics.arcade.collide(bullets, enemies, bulletHitEnemy, collisionProcess);
+  //game.physics.arcade.collide(player.player, enemies, playerHitEnemy, collisionProcess);
 
-  player.update();
   game.world.bringToTop(player.player);
 }
 
 function createEnemies() {
-  console.log(enemies.length);
-  if (enemies.length < 4 * player.corners && Math.round(Math.random() * 100) <= 10) {
+  //console.log(enemies.length);
+  if (enemies.length < 10 * player.corners && Math.round(Math.random() * 100) <= 10) {
     var ycoord = game._height + 1;
     while (ycoord > game._height) {
       ycoord = Math.round(Math.random() * 10000);
@@ -108,6 +112,8 @@ function createEnemies() {
     enemy.body.sprite.angle = -90;
     enemy.body.velocity.x = -40 * size;
 
+    enemy.size = size;
+
     enemies.add(enemy);
     //enemies.push(new Enemy({x:game._width, y:height}, (Math.atan2(game._width - player.pos.x, height - player.pos.y) * (180 / Math.PI)) + 90, 1));
   }
@@ -118,13 +124,42 @@ function updateEnemies() {
 }
 
 function updateEnemy(enemy) {
-  if (enemy.body == null) {
+  for (var x = 0; bullets.length > x; x += 1) {
+    if (checkCollision(bullets.getAt(x), enemy)) {
+      bulletHitEnemy(bullets.getAt(x), enemy);
+      return;
+    }
+  }
+
+  if (checkCollision(player.player, enemy)) {
+    playerHitEnemy(enemy);
     return;
   }
 
-  if (enemy.body.position.x < 0) {
-    enemy.destroy();
+  if (enemy.body == null) {
+    enemies.remove(enemy, true);
   }
+
+  if (!enemy.visible) {
+    enemies.remove(enemy, true);
+    console.log("removed", enemies.length);
+  }
+
+  if (enemy.body.position.x < 0) {
+    enemies.remove(enemy, true);
+  }
+}
+
+function damageEnemy(enemy) {
+  enemy.size -= 1;
+
+  if (enemy.size <= 0) {
+    enemy.destroy();
+    return;
+  }
+
+  enemy.body.sprite.loadTexture('enemy' + enemy.size);
+  enemy.body.velocity.x = -40 * enemy.size;
 }
 
 function updateBullets() {
@@ -141,8 +176,38 @@ function updateBullet(bullet) {
   }
 }
 
+function createExplosion(x, y) {
+  var random = 1;
+  var explosion = game.add.sprite(x, y, 'explosion' + random);
+  explosion.anchor.setTo(0.5, 0.5);
+
+  sounds.explode1.play();
+
+  setTimeout(function() {
+    explosion.visible = false;
+    explosion.destroy();
+  }, 400);
+}
+
+
+
+function checkCollision(object1, object2) {
+  if (!object1._exists || !object2._exists) {
+    return false;
+  }
+  
+  return Phaser.Rectangle.intersects(object1, object2);
+}
+
 function bulletHitEnemy(bullet, enemy) {
-  console.log("hit");
+  createExplosion(enemy.body.position.x, enemy.body.position.y);
   bullet.kill();
-  enemy.kill();
+  damageEnemy(enemy);
+}
+
+function playerHitEnemy(enemy) {
+  createExplosion(player.player.body.position.x, player.player.body.position.y);
+  createExplosion(enemy.body.position.x, enemy.body.position.y);
+  damageEnemy(enemy);
+  player.removeCorner();
 }
