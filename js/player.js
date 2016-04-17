@@ -11,7 +11,7 @@ function Player() {
   this.pos = this.player.body.position;
   this.vel = this.player.body.velocity;
 
-  this.fireRate = 40;
+  this.fireRate = 50;
   this.ticksSinceLastFire = 0;
   this.corners = 1;
 
@@ -59,6 +59,8 @@ Player.prototype.getFiringAngles = function() {
 }
 
 Player.prototype.fire = function() {
+  this.fireRate += 0.01;
+
   angles = this.getFiringAngles();
   //this.lastCornerFired += 1;
 
@@ -72,8 +74,8 @@ Player.prototype.fire = function() {
     game.physics.enable(bullet, Phaser.Physics.ARCADE);
     bullet.anchor.setTo(0.5, 0.5);
     bullet.body.sprite.angle = angles[x] - 90;
-    bullet.body.velocity.x = Math.cos(angles[x] * (Math.PI / 180)) * 800;
-    bullet.body.velocity.y = Math.sin(angles[x] * (Math.PI / 180)) * 800;
+    bullet.body.velocity.x = Math.cos(angles[x] * (Math.PI / 180)) * 400;
+    bullet.body.velocity.y = Math.sin(angles[x] * (Math.PI / 180)) * 400;
 
     bullets.add(bullet);
     //bullets.push(new Bullet(angles[x]));
@@ -85,18 +87,20 @@ Player.prototype.fire = function() {
 Player.prototype.update = function() {
   // ceiling/floor check
   if (this.pos.y < 0) {
-    this.pos.y += game._height;
+    this.pos.y = 0;
+    this.vel.y = 0;
   } else if (this.pos.y > game._height - this.player.body.height) {
-    this.pos.y -= game._height;
+    this.pos.y = game._height - this.player.body.height;
+    this.vel.y = 0;
   }
 
   // left/right check
   if (this.pos.x < 0) {
     this.pos.x = 0;
-    this.vel.x = -this.vel.x / 2;
+    this.vel.x = 0;
   } else if (this.pos.x > game._width - this.player.body.width) {
     this.pos.x = game._width - this.player.body.width;
-    this.vel.x = -this.vel.x / 2;
+    this.vel.x = 0;
   }
 
   if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
@@ -118,11 +122,11 @@ Player.prototype.update = function() {
   this.player.body.sprite.angle = -Math.atan2(game.input.mousePointer.x - this.pos.x, game.input.mousePointer.y - this.pos.y) * (180 / Math.PI);
 
   // slow down horizontally
-  this.vel.x -= (this.vel.x / 64);
-  this.vel.y -= (this.vel.y / 64);
+  this.vel.x -= (this.vel.x / 16);
+  this.vel.y -= (this.vel.y / 16);
 
   // I am 105% sure there is a better way to do this
-  if (game.input.keyboard.isDown(Phaser.Keyboard.ONE)) {
+  /*if (game.input.keyboard.isDown(Phaser.Keyboard.ONE)) {
     this.corners = 1;
   } else if(game.input.keyboard.isDown(Phaser.Keyboard.TWO)) {
     this.corners = 2;
@@ -140,7 +144,7 @@ Player.prototype.update = function() {
     this.corners = 8;
   } else if(game.input.keyboard.isDown(Phaser.Keyboard.NINE)) {
     this.corners = 9;
-  }
+  }*/
 
   this.updateTexture();
 

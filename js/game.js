@@ -1,5 +1,6 @@
 var game = new Phaser.Game(window.innerWidth, window.innerHeight - 1, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
 var background;
+var backgroundSpeed = 0;
 var paused;
 var player;
 var enemies;
@@ -50,12 +51,12 @@ function create() {
   sounds.fire2 = game.add.audio('fire2');
   sounds.explode1 = game.add.audio('explode1');
 
-  scoreText = game.add.text(game.halfWidth, game.halfHeight, "Score: 0", {
+  scoreText = game.add.text(10, 10, "Score: 0", {
     font: "20px Arial",
     fill: "#ff0044",
-    align: "left"
+    textshadow: "2px 2px #000000"
   });
-  scoreText.anchor.setTo(0.5, 0.5);
+  scoreText.anchor.setTo(0, 0);
 
   background = game.add.tileSprite(0, 0, game._width, game._height, 'background');
   //game.world.setBounds(0, 0, game._width, game._height);
@@ -91,7 +92,7 @@ function create() {
 }
 
 function update() {
-  background.tilePosition.x -= player.corners;
+  background.tilePosition.x -= backgroundSpeed;
 
   player.update();
 
@@ -101,6 +102,7 @@ function update() {
   upgrades.forEach(updateUpgrade, this, true);
 
   game.world.bringToTop(player.player);
+  game.world.bringToTop(scoreText);
 }
 
 function updateEnemy(enemy) {
@@ -159,7 +161,16 @@ function updateUpgrade(upgrade) {
 
 function createEnemies() {
   //console.log(enemies.length);
-  if (enemies.length < 10 * player.corners && Math.round(Math.random() * 100) <= 10) {
+  var maxenemies = 0;
+  maxenemies += 50 - player.fireRate;
+  maxenemies += 2 * player.corners;
+  maxenemies += Math.floor(score / 16);
+
+  backgroundSpeed = Math.ceil(maxenemies / 16);
+
+  console.log(maxenemies, score);
+
+  if (enemies.length < maxenemies && Math.round(Math.random() * 100) <= 10) {
     var ycoord = game._height + 1;
     while (ycoord > game._height - 20) {
       ycoord = Math.round(Math.random() * 10000);
@@ -187,12 +198,12 @@ function createUpgrade(x, y, chance) {
   if (Math.round(Math.random() * 100) <= chance) {
     var upgrade;
 
-    if (Math.round(Math.random() * 100) <= 60) {
-      // 60% chance for size upgrade
+    if (Math.round(Math.random() * 100) <= 50) {
+      // 50% chance for size upgrade
       upgrade = game.add.sprite(x, y, 'upgradeplayer');
       upgrade.upgradeType = "player";
     } else {
-      // 40% chance for fire rate upgrade
+      // 50% chance for fire rate upgrade
       upgrade = game.add.sprite(x, y, 'upgradebullet');
       upgrade.upgradeType = "bullet";
     }
@@ -220,12 +231,10 @@ function createExplosion(x, y) {
 }
 
 function damageEnemy(enemy) {
-  scoreText.setText("Score: " + score);
-
   enemy.size -= 1;
 
   if (enemy.size <= 0) {
-    createUpgrade(enemy.body.position.x, enemy.body.position.y, 5);
+    createUpgrade(enemy.body.position.x, enemy.body.position.y, 10);
     enemy.destroy();
     return;
   }
@@ -243,6 +252,9 @@ function checkCollision(object1, object2) {
 }
 
 function bulletHitEnemy(bullet, enemy) {
+  score += enemy.size;
+  scoreText.setText("Score: " + score);
+
   createExplosion(enemy.body.position.x, enemy.body.position.y);
   bullet.kill();
   damageEnemy(enemy);
@@ -259,8 +271,8 @@ function playerHitUpgrade(upgrade) {
   if (upgrade.upgradeType == "player") {
     player.addCorner();
   } else if (upgrade.upgradeType == "bullet") {
-    player.fireRate -= 10;
+    player.fireRate -= 2;
   }
-  
+
   upgrade.kill();
 }
