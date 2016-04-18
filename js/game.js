@@ -3,6 +3,8 @@ Shift.Game = function(game) {
 };
 
 Shift.Game.prototype.create = function() {
+  score = 0;
+
   sounds.fire1 = game.add.audio('fire1');
   sounds.fire2 = game.add.audio('fire2');
   sounds.explode1 = game.add.audio('explode1');
@@ -147,7 +149,7 @@ function updateScoreboard() {
 function createEnemies() {
   //console.log(enemies.length);
   var maxenemies = 1;
-  maxenemies += 40 - player.fireRate;
+  maxenemies += 30 - player.fireRate;
   maxenemies += Math.pow(player.corners, player.corners);
   maxenemies += Math.floor(score / 16);
 
