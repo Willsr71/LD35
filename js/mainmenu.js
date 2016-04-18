@@ -43,3 +43,13 @@ function tutoriallistener() {
 function highscoreslistener() {
   game.state.start('Highscores');
 }
+
+function backlistener() {
+  console.log("asdf")
+
+  game.state.start('MainMenu', true, false);
+}
+
+function tutorialclicklistener() {
+  game.state.getCurrentState().nextImage()
+}

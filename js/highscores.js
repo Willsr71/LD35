@@ -13,7 +13,3 @@ Shift.Highscores.prototype.create = function() {
   back.inputEnabled = true;
   back.events.onInputDown.add(backlistener, this);
 };
-
-function backlistener() {
-  game.state.start('MainMenu', true, false);
-}

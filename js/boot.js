@@ -17,6 +17,7 @@ var scoreText;
 var diedImage;
 var logo;
 var scores = {};
+var backImage;
 
 Shift.Boot = function(game) {};
 

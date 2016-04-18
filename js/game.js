@@ -27,6 +27,13 @@ Shift.Game.prototype.create = function() {
   diedImage.position.y = (game._height / 2) - (diedImage.height / 2);
   diedImage.visible = false;
 
+  back = game.add.sprite(0, 0, 'mainmenu');
+  back.position.x = 10;
+  back.position.y = game._height - back.height - 10;
+  back.inputEnabled = true;
+  back.events.onInputDown.add(backlistener, this);
+  back.visible = false;
+
   player = new Player();
 
   bullets = game.add.group();
@@ -46,9 +53,12 @@ Shift.Game.prototype.create = function() {
     if (isPaused) {
       game.paused = true;
       paused.visible = true;
+      back.visible = true;
       game.world.bringToTop(paused);
+      game.world.bringToTop(back);
     } else {
       paused.visible = false;
+      back.visible = false;
       game.paused = false;
     }
   });
@@ -277,4 +287,10 @@ function playerHitUpgrade(upgrade) {
   }
 
   upgrade.kill();
+}
+
+function backlistener() {
+  console.log("asdf");
+
+  game.state.start('MainMenu', true, false);
 }
