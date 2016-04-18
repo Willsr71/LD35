@@ -74,5 +74,14 @@ Shift.Boot.prototype.preload = function() {
 }
 
 Shift.Boot.prototype.create = function() {
+  getScores();
   game.state.start('MainMenu');
+}
+
+function saveScores() {
+
+}
+
+function getScores() {
+
 }

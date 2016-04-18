@@ -41,9 +41,14 @@ Player.prototype.removeCorner = function() {
   this.corners -= 1;
 
   if (this.corners <= 0) {
+    scores.put(score);
+    saveScores();
+
     game.paused = true;
     diedImage.visible = true;
+    back.visible = true;
     game.world.bringToTop(diedImage);
+    game.world.bringToTop(back);
     return;
   }
 

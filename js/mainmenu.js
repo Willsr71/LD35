@@ -45,8 +45,6 @@ function highscoreslistener() {
 }
 
 function backlistener() {
-  console.log("asdf")
-
   game.state.start('MainMenu', true, false);
 }
 

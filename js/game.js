@@ -288,9 +288,3 @@ function playerHitUpgrade(upgrade) {
 
   upgrade.kill();
 }
-
-function backlistener() {
-  console.log("asdf");
-
-  game.state.start('MainMenu', true, false);
-}
