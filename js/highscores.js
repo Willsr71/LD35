@@ -12,4 +12,37 @@ Shift.Highscores.prototype.create = function() {
   back.position.y = game._height - back.height - 10;
   back.inputEnabled = true;
   back.events.onInputDown.add(backlistener, this);
+
+  console.log(this.image.position.y + this.image.height + 20);
+  this.loading = game.add.text((game._width / 2), this.image.position.y + this.image.height + 20, "Retrieving top scores...", {
+    font: "20px Arial",
+    fill: "#ffffff",
+    align: "center"
+  });
+  this.loading.anchor.setTo(0.5, 0.5);
+
+  getScores();
 };
+
+function putScores() {
+  for (var x = 0; x < scores.length; x += 1) {
+    var height = (x * 20) +  game.state.getCurrentState().image.position.y + game.state.getCurrentState().image.height + 20;
+    var nameText = game.add.text((game._width / 2), height, scores[x].username + " ", {
+      font: "20px Arial",
+      fill: "#ffffff",
+      align: "left"
+    });
+
+    nameText.anchor.setTo(1, 0.5);
+
+    var scoreText = game.add.text((game._width / 2), height, " " + scores[x].score, {
+      font: "20px Arial",
+      fill: "#ffffff",
+      align: "right"
+    });
+
+    scoreText.anchor.setTo(0, 0.5);
+  }
+
+  game.state.getCurrentState().loading.visible = false;
+}

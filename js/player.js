@@ -41,14 +41,19 @@ Player.prototype.removeCorner = function() {
   this.corners -= 1;
 
   if (this.corners <= 0) {
-    scores.put(score);
-    saveScores();
-
     game.paused = true;
     diedImage.visible = true;
     back.visible = true;
     game.world.bringToTop(diedImage);
     game.world.bringToTop(back);
+
+    setTimeout(function() {
+      if (username == null) {
+        username = window.prompt("Please enter your username for the scoreboard.");
+      }
+      saveScore(score);
+    }, 10);
+
     return;
   }
 

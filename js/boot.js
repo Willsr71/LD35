@@ -16,8 +16,9 @@ var score = 0;
 var scoreText;
 var diedImage;
 var logo;
-var scores = {};
 var backImage;
+var username;
+var scores;
 
 Shift.Boot = function(game) {};
 
@@ -74,14 +75,21 @@ Shift.Boot.prototype.preload = function() {
 }
 
 Shift.Boot.prototype.create = function() {
-  getScores();
   game.state.start('MainMenu');
 }
 
-function saveScores() {
-
+function getScores() {
+  var script = document.createElement("script");
+  script.id = "score" + score;
+  script.type = "text/javascript";
+  script.src = "//noxal.net/ld35/getscores.php";
+  document.head.appendChild(script);
 }
 
-function getScores() {
-
+function saveScore() {
+  var script = document.createElement("script");
+	script.id = "score" + score;
+  script.type = "text/javascript";
+	script.src = "//noxal.net/ld35/putscore.php?username=" + username + "&score=" + score;
+	document.head.appendChild(script);
 }
