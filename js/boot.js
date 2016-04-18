@@ -53,6 +53,17 @@ Shift.Boot.prototype.preload = function() {
   game.load.image('upgradeplayer', 'assets/image/upgradeplayer.png');
   game.load.image('youdied', 'assets/image/youdied.png');
 
+  game.load.image('tutorial1', 'assets/image/tutorial/tutorial1.png');
+  game.load.image('tutorial2', 'assets/image/tutorial/tutorial2.png');
+  game.load.image('tutorial3', 'assets/image/tutorial/tutorial3.png');
+  game.load.image('tutorial4', 'assets/image/tutorial/tutorial4.png');
+  game.load.image('tutorial5', 'assets/image/tutorial/tutorial5.png');
+  game.load.image('tutorial6', 'assets/image/tutorial/tutorial6.png');
+  game.load.image('tutorial7', 'assets/image/tutorial/tutorial7.png');
+  game.load.image('tutorial8', 'assets/image/tutorial/tutorial8.png');
+  game.load.image('tutorial9', 'assets/image/tutorial/tutorial9.png');
+  game.load.image('tutorial10', 'assets/image/tutorial/tutorial10.png');
+
   // audio
   game.load.audio('explode1', 'assets/sound/explode1.wav');
   game.load.audio('fire1', 'assets/sound/fire1.wav');

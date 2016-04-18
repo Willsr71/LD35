@@ -11,7 +11,7 @@ function Player() {
   this.pos = this.player.body.position;
   this.vel = this.player.body.velocity;
 
-  this.fireRate = 50;
+  this.fireRate = 40;
   this.ticksSinceLastFire = 0;
   this.corners = 1;
 
@@ -65,6 +65,10 @@ Player.prototype.getFiringAngles = function() {
 
 Player.prototype.fire = function() {
   this.fireRate += 0.01;
+
+  if (this.fireRate > 40) {
+    this.fireRate = 40;
+  }
 
   angles = this.getFiringAngles();
   //this.lastCornerFired += 1;

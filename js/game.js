@@ -58,9 +58,8 @@ Shift.Game.prototype.create = function() {
       return;
     }
 
-    console.log("test");
-
-    game.state.start('MainMenu');
+    game.state.start('MainMenu', true, false);
+    game.paused = false;
   });
 }
 
@@ -139,8 +138,8 @@ function updateScoreboard() {
 function createEnemies() {
   //console.log(enemies.length);
   var maxenemies = 0;
-  maxenemies += 50 - player.fireRate;
-  maxenemies += 2 * player.corners;
+  maxenemies += 40 - player.fireRate;
+  maxenemies += Math.pow(player.corners, player.corners);
   maxenemies += Math.floor(score / 16);
 
   backgroundSpeed = Math.ceil(maxenemies / 16);

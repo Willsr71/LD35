@@ -21,11 +21,11 @@ Shift.MainMenu.prototype.create = function() {
   tutorial.inputEnabled = true;
   tutorial.events.onInputDown.add(tutoriallistener, this);
 
-  var highscores = game.add.sprite(0, 0, 'highscores');
+  /*var highscores = game.add.sprite(0, 0, 'highscores');
   highscores.position.x = (game._width / 2) - (highscores.width / 2);
   highscores.position.y = (game._height / 4) - (logo.height / 2) + 400;
   highscores.inputEnabled = true;
-  highscores.events.onInputDown.add(highscoreslistener, this);
+  highscores.events.onInputDown.add(highscoreslistener, this);*/
 }
 
 Shift.MainMenu.prototype.update = function() {
