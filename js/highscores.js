@@ -13,7 +13,6 @@ Shift.Highscores.prototype.create = function() {
   back.inputEnabled = true;
   back.events.onInputDown.add(backlistener, this);
 
-  console.log(this.image.position.y + this.image.height + 20);
   this.loading = game.add.text((game._width / 2), this.image.position.y + this.image.height + 20, "Retrieving top scores...", {
     font: "20px Arial",
     fill: "#ffffff",
