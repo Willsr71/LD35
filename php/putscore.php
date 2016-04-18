@@ -1,6 +1,6 @@
 <?php
 if (isset($_GET["username"]) && isset($_GET["score"])) {
-  $database = mysqli_connect("localhost", "ld35", "sdWHpeKDVXb7qtVy", "ld35");
+  $database = mysqli_connect("localhost", "ld35", "", "ld35");
   mysqli_query($database, "INSERT INTO `galaxyshifter_scores` (`username`, `score`) VALUES ('" . $_GET["username"] . "', '" . $_GET["score"] . "');");
 
   echo('var element' . $_GET["score"] . ' = document.getElementById("score' . $_GET["score"] . '");');
