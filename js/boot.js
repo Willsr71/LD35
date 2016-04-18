@@ -16,6 +16,7 @@ var score = 0;
 var scoreText;
 var diedImage;
 var logo;
+var scores = {};
 
 Shift.Boot = function(game) {};
 
@@ -36,6 +37,7 @@ Shift.Boot.prototype.preload = function() {
   game.load.image('explosion1', 'assets/image/explosion1.png');
   game.load.image('highscores', 'assets/image/highscores.png');
   game.load.image('logo', 'assets/image/logo.png');
+  game.load.image('mainmenu', 'assets/image/mainmenu.png');
   game.load.image('paused', 'assets/image/paused.png');
   game.load.image('player1', 'assets/image/player1.png');
   game.load.image('player2', 'assets/image/player2.png');
