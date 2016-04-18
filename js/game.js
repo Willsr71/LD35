@@ -106,7 +106,6 @@ function updateEnemy(enemy) {
 
   if (!enemy.visible) {
     enemies.remove(enemy, true);
-    console.log("removed", enemies.length);
   }
 
   if (enemy.body.position.x < 0) {
@@ -121,7 +120,7 @@ function updateBullet(bullet) {
     return;
   }
 
-  if (bullet.body.position.y < 0 || bullet.body.position.y > game._height - bullet.body.height ||bullet.body.position.x < 0 || bullet.body.position.x > game._width - bullet.body.width) {
+  if (bullet.body.position.y < 0 || bullet.body.position.y > game._height - bullet.body.height || bullet.body.position.x < 0 || bullet.body.position.x > game._width - bullet.body.width) {
     bullet.destroy();
   }
 }
@@ -136,7 +135,7 @@ function updateUpgrade(upgrade) {
     return;
   }
 
-  if (upgrade.body.position.y < 0 || upgrade.body.position.y > game._height - upgrade.body.height ||upgrade.body.position.x < 0 || upgrade.body.position.x > game._width - upgrade.body.width) {
+  if (upgrade.body.position.y < 0 || upgrade.body.position.y > game._height - upgrade.body.height || upgrade.body.position.x < 0 || upgrade.body.position.x > game._width - upgrade.body.width) {
     upgrade.destroy();
   }
 }
@@ -147,14 +146,12 @@ function updateScoreboard() {
 
 function createEnemies() {
   //console.log(enemies.length);
-  var maxenemies = 0;
+  var maxenemies = 1;
   maxenemies += 40 - player.fireRate;
   maxenemies += Math.pow(player.corners, player.corners);
   maxenemies += Math.floor(score / 16);
 
   backgroundSpeed = Math.ceil(maxenemies / 16);
-
-  console.log(maxenemies, score);
 
   if (enemies.length < maxenemies && Math.round(Math.random() * 100) <= 10) {
     var ycoord = game._height + 1;
@@ -193,7 +190,7 @@ function createUpgrade(x, y, chance) {
   if (Math.round(Math.random() * 100) <= chance) {
     var upgrade;
 
-    if (Math.round(Math.random() * 100) <= 50) {
+    if (Math.round(Math.random() * 100) <= 30) {
       // 50% chance for size upgrade
       upgrade = game.add.sprite(x, y, 'upgradeplayer');
       upgrade.upgradeType = "player";
@@ -201,7 +198,7 @@ function createUpgrade(x, y, chance) {
       createUpgradeEntity(upgrade);
     }
 
-    if (Math.round(Math.random() * 100) <= 50) {
+    if (Math.round(Math.random() * 100) <= 60) {
       // 50% chance for fire rate upgrade
       upgrade = game.add.sprite(x, y, 'upgradebullet');
       upgrade.upgradeType = "bullet";
@@ -235,7 +232,7 @@ function damageEnemy(enemy) {
   enemy.size -= 1;
 
   if (enemy.size <= 0) {
-    createUpgrade(enemy.body.position.x, enemy.body.position.y, 10);
+    createUpgrade(enemy.body.position.x, enemy.body.position.y, 20);
     enemy.destroy();
     return;
   }
