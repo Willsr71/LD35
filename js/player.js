@@ -49,7 +49,10 @@ Player.prototype.removeCorner = function() {
 
     setTimeout(function() {
       if (username == null) {
-        username = window.prompt("Please enter your username for the scoreboard.");
+        username = window.prompt("Please enter your username for the scoreboard.\nIf nothing is entered you will be listed as Anonymous.");
+        if (username == null || username == "") {
+          username = "Anonymous";
+        }
       }
       saveScore(score);
     }, 10);
