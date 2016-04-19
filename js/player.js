@@ -55,9 +55,8 @@ Player.prototype.removeCorner = function() {
         }
       }
       saveScore(score);
+      score = 0;
     }, 10);
-
-    score = 0;
 
     return;
   }
